@@ -1,1 +1,436 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DongHun Smart Calculator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #10131c;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.calculator {
+    width: 360px;
+    max-width: 100%;
+    background: #1c2230;
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    font-size: 19px;
+    margin: 0;
+}
+
+.header span {
+    color: #8c9bb8;
+    font-size: 12px;
+}
+
+.display {
+    background: #111722;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: right;
+    margin-bottom: 20px;
+    min-height: 115px;
+}
+
+#expression {
+    color: #8c9bb8;
+    font-size: 15px;
+    min-height: 22px;
+    overflow-wrap: anywhere;
+}
+
+#result {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button {
+    height: 58px;
+    border: none;
+    border-radius: 13px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #30394c;
+    color: white;
+    transition: 0.15s;
+}
+
+button:hover {
+    filter: brightness(1.25);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.function {
+    background: #46516a;
+    color: #b9d4ff;
+}
+
+.operator {
+    background: #354d75;
+    color: #8fc2ff;
+}
+
+.equal {
+    background: #3987ef;
+    color: white;
+}
+
+.zero {
+    grid-column: span 2;
+}
+
+.history {
+    margin-top: 25px;
+    border-top: 1px solid #394255;
+    padding-top: 15px;
+}
+
+.history-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-title h3 {
+    font-size: 15px;
+    margin: 0;
+}
+
+#historyList {
+    max-height: 120px;
+    overflow-y: auto;
+    color: #aab6ca;
+    font-size: 13px;
+}
+
+.history-item {
+    padding: 7px 0;
+    border-bottom: 1px solid #30394c;
+    cursor: pointer;
+}
+
+.history-item:hover {
+    color: white;
+}
+
+#clearHistory {
+    background: none;
+    color: #8c9bb8;
+    font-size: 12px;
+    height: auto;
+    padding: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="header">
+        <h2>⚡ DongHun Calculator</h2>
+        <span>SMART CALCULATOR</span>
+    </div>
+
+    <div class="display">
+        <div id="expression">0</div>
+        <div id="result">0</div>
+    </div>
+
+    <div class="buttons">
+
+        <button class="function" onclick="clearAll()">AC</button>
+        <button class="function" onclick="deleteOne()">DEL</button>
+        <button class="function" onclick="append('(')">(</button>
+        <button class="function" onclick="append(')')">)</button>
+
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="operator" onclick="append('/')">÷</button>
+
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button class="operator" onclick="append('*')">×</button>
+
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="operator" onclick="append('-')">−</button>
+
+        <button class="function" onclick="append('%')">%</button>
+        <button class="zero" onclick="append('0')">0</button>
+        <button class="operator" onclick="append('+')">+</button>
+
+        <button class="function" onclick="append('.')">.</button>
+        <button class="equal" style="grid-column: span 3"
+            onclick="calculate()">=</button>
+
+    </div>
+
+    <div class="history">
+        <div class="history-title">
+            <h3>🕒 계산 기록</h3>
+            <button id="clearHistory" onclick="clearHistory()">기록 삭제</button>
+        </div>
+        <div id="historyList">아직 계산 기록이 없습니다.</div>
+    </div>
+
+</div>
+
+<script>
+let expression = "";
+let justCalculated = false;
+let history = [];
+
+const expressionDisplay = document.getElementById("expression");
+const resultDisplay = document.getElementById("result");
+
+// 숫자 및 연산자 입력
+function append(value) {
+
+    if (justCalculated) {
+        if (/[0-9.(]/.test(value)) {
+            expression = "";
+        }
+        justCalculated = false;
+    }
+
+    expression += value;
+    expressionDisplay.textContent = expression || "0";
+    resultDisplay.textContent = "0";
+}
+
+// 전체 초기화
+function clearAll() {
+    expression = "";
+    justCalculated = false;
+    expressionDisplay.textContent = "0";
+    resultDisplay.textContent = "0";
+}
+
+// 마지막 문자 삭제
+function deleteOne() {
+    expression = expression.slice(0, -1);
+    justCalculated = false;
+    expressionDisplay.textContent = expression || "0";
+    resultDisplay.textContent = "0";
+}
+
+// 수식 계산: eval() 사용하지 않는 직접 구현
+function calculateExpression(input) {
+
+    const tokens = input.match(
+        /(?:\d+(?:\.\d*)?|\.\d+)|[+\-*/()%]/g
+    );
+
+    if (!tokens || tokens.join("") !== input.replace(/\s/g, "")) {
+        throw new Error("잘못된 수식입니다.");
+    }
+
+    let pos = 0;
+
+    function expressionParser() {
+        let value = term();
+
+        while (tokens[pos] === "+" || tokens[pos] === "-") {
+            let op = tokens[pos++];
+            let right = term();
+
+            value = op === "+" ? value + right : value - right;
+        }
+
+        return value;
+    }
+
+    function term() {
+        let value = factor();
+
+        while (
+            tokens[pos] === "*" ||
+            tokens[pos] === "/" ||
+            tokens[pos] === "%"
+        ) {
+            let op = tokens[pos++];
+            let right = factor();
+
+            if ((op === "/" || op === "%") && right === 0) {
+                throw new Error("0으로 나눌 수 없습니다.");
+            }
+
+            if (op === "*") value *= right;
+            if (op === "/") value /= right;
+            if (op === "%") value %= right;
+        }
+
+        return value;
+    }
+
+    function factor() {
+        let token = tokens[pos];
+
+        if (token === "+") {
+            pos++;
+            return factor();
+        }
+
+        if (token === "-") {
+            pos++;
+            return -factor();
+        }
+
+        if (token === "(") {
+            pos++;
+            let value = expressionParser();
+
+            if (tokens[pos] !== ")") {
+                throw new Error("괄호를 확인해 주세요.");
+            }
+
+            pos++;
+            return value;
+        }
+
+        if (token === undefined || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token)) {
+            throw new Error("수식을 확인해 주세요.");
+        }
+
+        pos++;
+        return Number(token);
+    }
+
+    let result = expressionParser();
+
+    if (pos !== tokens.length || !Number.isFinite(result)) {
+        throw new Error("올바르지 않은 계산입니다.");
+    }
+
+    return Number(result.toPrecision(12));
+}
+
+// 계산 실행
+function calculate() {
+
+    if (!expression) return;
+
+    try {
+        let answer = calculateExpression(expression);
+
+        expressionDisplay.textContent = expression + " =";
+        resultDisplay.textContent = answer;
+
+        history.unshift({
+            expression: expression,
+            result: answer
+        });
+
+        updateHistory();
+
+        expression = String(answer);
+        justCalculated = true;
+
+    } catch (error) {
+        resultDisplay.textContent = error.message;
+        justCalculated = true;
+    }
+}
+
+// 계산 기록 표시
+function updateHistory() {
+
+    const list = document.getElementById("historyList");
+
+    if (history.length === 0) {
+        list.textContent = "아직 계산 기록이 없습니다.";
+        return;
+    }
+
+    list.innerHTML = "";
+
+    history.forEach((item) => {
+        let div = document.createElement("div");
+
+        div.className = "history-item";
+        div.textContent =
+            item.expression + " = " + item.result;
+
+        div.onclick = function() {
+            expression = String(item.result);
+            justCalculated = false;
+            expressionDisplay.textContent = expression;
+            resultDisplay.textContent = item.result;
+        };
+
+        list.appendChild(div);
+    });
+}
+
+// 기록 삭제
+function clearHistory() {
+    history = [];
+    updateHistory();
+}
+
+// 키보드 입력 지원
+document.addEventListener("keydown", function(event) {
+
+    if (/^[0-9.+\-*/()%]$/.test(event.key)) {
+        append(event.key);
+    }
+    else if (event.key === "Enter") {
+        calculate();
+    }
+    else if (event.key === "Backspace") {
+        deleteOne();
+    }
+    else if (event.key === "Escape") {
+        clearAll();
+    }
+});
+
+</script>
+
+</body>
+</html>
+
+
