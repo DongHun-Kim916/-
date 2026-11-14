@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계산기</title>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .disp {
+            width: 205px;
+            height: 40px;
+            margin-top: 3px;
+        }
+
+        input[type=button] {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            margin-top: 5px;
+        }
+
+        #calc {
+            width: 220px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+
+            let firstNumber = 0;
+            let operator = "";
+
+            // 숫자 버튼 클릭
+            $('.num').click(function(){
+                let cur = $('#disp2').val();
+                let n = $(this).val();
+
+                $('#disp2').val(cur + n);
+            });
+
+            // 연산자 버튼 클릭
+            $('.op').click(function(){
+                let opt = $(this).val();
+
+                // = 버튼 클릭
+                if(opt == "="){
+
+                    if(operator == "" || $('#disp2').val() == ""){
+                        return;
+                    }
+
+                    let secondNumber = Number($('#disp2').val());
+                    let result = 0;
+
+                    if(operator == "+"){
+                        result = firstNumber + secondNumber;
+                    }
+                    else if(operator == "-"){
+                        result = firstNumber - secondNumber;
+                    }
+                    else if(operator == "*"){
+                        result = firstNumber * secondNumber;
+                    }
+                    else if(operator == "/"){
+                        if(secondNumber == 0){
+                            $('#disp2').val("오류");
+                            return;
+                        }
+
+                        result = firstNumber / secondNumber;
+                    }
+
+                    $('#disp1').val("");
+                    $('#disp2').val(result);
+
+                    firstNumber = result;
+                    operator = "";
+                }
+
+                // 일반 연산자 클릭
+                else{
+                    if($('#disp2').val() == ""){
+                        return;
+                    }
+
+                    firstNumber = Number($('#disp2').val());
+                    operator = opt;
+
+                    $('#disp1').val(firstNumber + " " + operator);
+                    $('#disp2').val("");
+                }
+            });
+
+            // AC 버튼 클릭
+            $('.func').click(function(){
+                $('#disp1').val("");
+                $('#disp2').val("");
+
+                firstNumber = 0;
+                operator = "";
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <h1>계산기</h1>
+
+    <div id="calc">
+
+        <div>
+            <input type="text" class="disp" id="disp1" readonly>
+            <input type="text" class="disp" id="disp2" readonly>
+        </div>
+
+        <input type="button" class="num" value="7">
+        <input type="button" class="num" value="8">
+        <input type="button" class="num" value="9">
+        <input type="button" class="op" value="+"><br>
+
+        <input type="button" class="num" value="4">
+        <input type="button" class="num" value="5">
+        <input type="button" class="num" value="6">
+        <input type="button" class="op" value="-"><br>
+
+        <input type="button" class="num" value="1">
+        <input type="button" class="num" value="2">
+        <input type="button" class="num" value="3">
+        <input type="button" class="op" value="*"><br>
+
+        <input type="button" class="func" value="AC">
+        <input type="button" class="num" value="0">
+        <input type="button" class="op" value="=">
+        <input type="button" class="op" value="/">
+
+    </div>
+
+</body>
+</html>
